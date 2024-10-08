@@ -3,9 +3,7 @@ from app.test.base import BaseTest
 from fastapi import status
 
 from app.organisation.factories import OrganisationFactory
-from .. import services
 from app.accounts.factories import UserFactory
-from app.todo.models import Todo
 
 
 class OrganisationTest(BaseTest):
