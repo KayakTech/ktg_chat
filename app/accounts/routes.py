@@ -1,5 +1,4 @@
 
-from typing import Annotated
 from fastapi import APIRouter, Depends, Request
 
 from .schemas import UserResponseSchema, UserSchema
