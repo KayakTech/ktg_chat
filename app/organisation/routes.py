@@ -9,7 +9,7 @@ from app.organisation.models import Organisation
 from pydantic import UUID4
 from app.core.dependency_injection import service_locator
 from datetime import timedelta
-from app.settings import ORGANISATION_TOKEN_EXPIRE_AT
+from app.settings import ORGANISATION_TOKEN_EXPIRE_DAYS
 from fastapi import HTTPException, status
 
 from app.authentication.utils import create_access_token
@@ -81,7 +81,7 @@ class ProjectView:
 
         data = {"organisation_id": str(organisation_id)}
         data = {
-            "token": create_access_token(data=data, expires_delta=timedelta(days=ORGANISATION_TOKEN_EXPIRE_AT))
+            "token": create_access_token(data=data, expires_delta=timedelta(days=ORGANISATION_TOKEN_EXPIRE_DAYS))
         }
 
         updated_orginisation = service_locator.general_service.update_data(
