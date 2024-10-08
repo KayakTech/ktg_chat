@@ -99,6 +99,16 @@ class RoomView:
 
         return chats
 
+    @router.put("/chats/{id}/", response_model=ChatSchema)
+    @router.patch("/chats/{id}/", response_model=ChatSchema)
+    async def update_chat(self, id: UUID4, data: ChatSchema):
+        data = data.dict(exclude_unset=True)
+
+        response = service_locator.general_service.update_data(
+            self.db, key=id, data=data, model=Chat)
+
+        return response
+
     @router.post("/{room_id}/add-participant/", response_model={})
     async def add_participant(self, room_id: UUID4, data: ParticipantSchema):
 
