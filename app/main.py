@@ -6,7 +6,6 @@ from app.accounts.routes import router as accounts_router
 from app.organisation.routes import router as projects_router
 from app.chat.routes import router as room_router
 
-# from fastapi_amis_admin.admin.settings import Settings
 # from fastapi_amis_admin.admin.site import AdminSite
 
 from app.accounts.models import User
