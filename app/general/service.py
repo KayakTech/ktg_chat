@@ -28,7 +28,8 @@ class GeneralService:
         self.raise_not_found(project)
         db.delete(project)
         db.commit()
-        return {"detail": "Organisation deleted successfully"}
+
+        return {"detail": " deleted successfully"}
 
     def update_data(self, db: Session, key: UUID4, data: dict, model: BaseModel):
         project = db.query(model).filter(
@@ -52,8 +53,9 @@ class GeneralService:
 
         return query.one_or_none() if single else query.all()
 
-    def get_participant_by_email(self, db: Session, email: str, model: BaseModel) -> Participant:
-        participant = self.filter_data(db, {"email": email}, model, True)
+    def get_participant_data(self, db: Session, filter_values: dict, model: BaseModel) -> Participant:
+        participant = self.filter_data(
+            db=db, filter_values=filter_values, model=model, single=True)
 
         if participant is None:
             raise HTTPException(

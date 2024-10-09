@@ -24,7 +24,7 @@ class RoomView:
 
     @router.get("/", response_model=list[RoomSchemaResponse])
     @router.post("/", response_model=RoomSchema)
-    async def rooms(self, request: Request, data: RoomSchema):
+    async def rooms(self, request: Request, data: RoomSchema = None):
 
         if request.method == "GET":
 
@@ -41,7 +41,7 @@ class RoomView:
         response = service_locator.general_service.create_data(self.db, data)
         return response
 
-    @router.get("/my-rooms/{email}/", response_model=list[RoomSchema])
+    @router.get("/my-rooms/{email}/", response_model=list[RoomSchemaResponse])
     def get_user_rooms(self, email: str):
         rooms = services.get_rooms_for_participant(self.db, email)
 
@@ -51,21 +51,22 @@ class RoomView:
 
         return rooms
 
-    @router.get("{id}/", response_model=RoomSchema)
+    @router.get("/{id}/", response_model=RoomSchemaResponse)
     async def get_room(self, id: UUID4):
 
         response = service_locator.general_service.get_data_by_id(
             self.db, id, Room)
         return response
 
-    @router.delete("{id}")
+    @router.delete("/{id}/")
     async def delete_room(self, id: UUID4):
         response = service_locator.general_service.delete_data(
             self.db, id, Room)
+
         return response
 
-    @router.put("{id}/", response_model=RoomSchema)
-    @router.patch("{id}", response_model=RoomSchema)
+    @router.put("/{id}/", response_model=RoomSchema)
+    @router.patch("/{id}", response_model=RoomSchema)
     async def update_room(self, id: UUID4, data: RoomSchema):
         data = data.dict(exclude_unset=True)
 
@@ -74,19 +75,39 @@ class RoomView:
 
         return response
 
-    @router.post("/chats/", response_model=ChatSchema)
+    @router.post("/chats/", response_model=ChatResponseSchema)
     async def create_chat(self, request: Request, data: ChatSchema):
-
-        email = data.__dict__.pop('email')
+        email = data.email
 
         if not email:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="email is required")
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email is required"
+            )
 
-        data.__dict__['created_by_id'] = service_locator.general_service.get_participant_by_email(
-            self.db, email, Participant).id
+        # Fetch participant by email
+        participant = service_locator.general_service.get_participant_data(
+            self.db, {"email": email}, Participant
+        )
 
-        chat = Chat(**data.__dict__)
+        if not participant:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Participant not found"
+            )
+
+        # Fetch the room and check if participant is part of it
+        room = self.db.query(Room).filter(
+            Room.id == data.room_id).one_or_none()
+
+        if not room or participant not in room.participants:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You are not a participant of this room"
+            )
+
+        chat = Chat(**data.dict(exclude={'email'}),
+                    created_by_id=participant.id)
 
         chats = service_locator.general_service.create_data(self.db, chat)
         return chats
@@ -99,8 +120,8 @@ class RoomView:
 
         return chats
 
-    @router.put("/chats/{id}/", response_model=ChatSchema)
-    @router.patch("/chats/{id}/", response_model=ChatSchema)
+    @router.put("/chats/{id}/", response_model=ChatResponseSchema)
+    @router.patch("/chats/{id}/", response_model=ChatResponseSchema)
     async def update_chat(self, id: UUID4, data: ChatSchema):
         data = data.dict(exclude_unset=True)
 
