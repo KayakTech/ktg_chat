@@ -72,7 +72,7 @@ class ProjectView:
         data = data.dict(exclude_unset=True)
 
         updated_project = service_locator.general_service.update_data(
-            self.db, project_id=id, data=data, model=Organisation)
+            self.db, key=id, data=data, model=Organisation)
 
         return updated_project
 
