@@ -1,7 +1,13 @@
+# Init Alembic
+
+```
+alembic init migrations
+```
+
 # Creating migration
 
 ```
-$ alembic revision --autogenerate -m "message"
+$ alembic revision --autogenerate -m "first migrations"
 $ alembic upgrade head
 
 # To downgrade

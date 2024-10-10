@@ -1,23 +1,17 @@
 from sqlalchemy import create_engine
-
 from sqlalchemy.orm import sessionmaker, declarative_base
 from pathlib import Path
-import os
-
+from app.settings import SQLALCHEMY_DATABASE_URL
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Set up the database URL for PostgreSQL
 
-DB_PATH = os.path.join(BASE_DIR, 'sql_app.db')
-print(DB_PATH)
-SQLALCHEMY_DATABASE_URL = f"sqlite:///{DB_PATH}"
+# Create the SQLAlchemy engine
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
-
-# SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
-
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-)
+# Create a configured "Session" class
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+# Create a base class for declarative models
 Base = declarative_base()

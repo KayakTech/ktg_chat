@@ -87,7 +87,7 @@ class RoomView:
 
         # Fetch participant by email
         participant = service_locator.general_service.get_participant_data(
-            self.db, {"email": email}, Participant
+            self.db, {"email": email}, Participant, single_record=True
         )
 
         if not participant:
