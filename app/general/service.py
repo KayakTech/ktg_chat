@@ -53,9 +53,9 @@ class GeneralService:
 
         return query.one_or_none() if single else query.all()
 
-    def get_participant_data(self, db: Session, filter_values: dict, model: BaseModel) -> Participant:
+    def get_participant_data(self, db: Session, filter_values: dict, model: BaseModel, single_record=False) -> Participant:
         participant = self.filter_data(
-            db=db, filter_values=filter_values, model=model, single=True)
+            db=db, filter_values=filter_values, model=model, single=single_record)
 
         if participant is None:
             raise HTTPException(
